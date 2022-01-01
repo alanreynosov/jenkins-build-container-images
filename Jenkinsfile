@@ -15,7 +15,9 @@ spec:
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
-    tty: true
+    args:
+    - "--context=git://github.com/scriptcamp/kubernetes-kaniko"
+    - "--destination=alanreynoso/kaniko-demo-image:1.0"
     volumeMounts:
     - name: kaniko-secret
       mountPath: /kaniko/.docker
@@ -33,9 +35,15 @@ spec:
 
     stages {
 
+        stage('Checkout Code') {
+            steps {
+              checkout scm
+            }
+        }
+
         stage('Build with Kaniko') {
           steps {
-            container(name: 'kaniko', shell: '/bin/sh') {
+            container(name: 'kaniko', shell: '/busybox/sh') {
               withEnv(['PATH+EXTRA=/busybox']) {
                 sh '''#!/busybox/sh -xe
                   /kaniko/executor \
