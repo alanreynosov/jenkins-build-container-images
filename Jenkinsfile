@@ -5,41 +5,33 @@ def podLabel = "kaniko-${UUID.randomUUID().toString()}"
 pipeline {
     agent {
         kubernetes {
-            label podLabel
+            label kaniko
             defaultContainer 'jnlp'
             yaml """
 apiVersion: v1
 kind: Pod
 metadata:
-  labels:
-    jenkins-build: app-build
-    some-label: "build-app-${BUILD_NUMBER}"
+  name: kaniko
 spec:
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
-    imagePullPolicy: IfNotPresent
-    command:
-    - /busybox/cat
-    tty: true
+    args:
+    - "--context=git://github.com/scriptcamp/kubernetes-kaniko"
+    - "--destination=alanreynoso/kaniko-demo-image:1.0"
     volumeMounts:
-      - name: jenkins-docker-cfg
-        mountPath: /kaniko/.docker
+    - name: kaniko-secret
+      mountPath: /kaniko/.docker
+  restartPolicy: Never
   volumes:
-  - name: jenkins-docker-cfg
-    projected:
-      sources:
-      - secret:
-          name: docker-credentials
-          items:
-            - key: .dockerconfigjson
-              path: config.json
+  - name: kaniko-secret
+    secret:
+      secretName: dockercred
+      items:
+        - key: .dockerconfigjson
+          path: config.json
 """
         }
-    }
-
-    environment {
-        GITHUB_ACCESS_TOKEN  = credentials('githubpersonaltoken')
     }
 
     stages {
