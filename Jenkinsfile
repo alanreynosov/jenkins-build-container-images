@@ -1,12 +1,11 @@
 #!groovy
 
-def podLabel = "kaniko-${UUID.randomUUID().toString()}"
+//def podLabel = "kaniko-${UUID.randomUUID().toString()}"
 
 pipeline {
     agent {
         kubernetes {
-            label podLabel
-            defaultContainer 'jnlp'
+            defaultContainer 'kaniko'
             yaml """
 apiVersion: v1
 kind: Pod
@@ -16,9 +15,7 @@ spec:
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
-    args:
-    - "--context=git://github.com/scriptcamp/kubernetes-kaniko"
-    - "--destination=alanreynoso/kaniko-demo-image:1.0"
+    tty: true
     volumeMounts:
     - name: kaniko-secret
       mountPath: /kaniko/.docker
@@ -36,15 +33,9 @@ spec:
 
     stages {
 
-        stage('Checkout Code') {
-            steps {
-              checkout scm
-            }
-        }
-
         stage('Build with Kaniko') {
           steps {
-            container(name: 'kaniko', shell: '/busybox/sh') {
+            container(name: 'kaniko', shell: '/bin/sh') {
               withEnv(['PATH+EXTRA=/busybox']) {
                 sh '''#!/busybox/sh -xe
                   /kaniko/executor \
