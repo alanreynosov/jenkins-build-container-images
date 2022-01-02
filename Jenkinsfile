@@ -2,28 +2,28 @@ pipeline {
   agent {
     kubernetes {
       yaml """
+apiVersion: v1
 kind: Pod
+metadata:
+  name: kaniko
 spec:
   containers:
   - name: kaniko
-    image: gcr.io/kaniko-project/executor:debug
-    imagePullPolicy: Always
-    command:
-    - sleep
+    image: gcr.io/kaniko-project/executor:latest
     args:
-    - 9999999
+    - "--context=git://github.com/scriptcamp/kubernetes-kaniko"
+    - "--destination=alanreynoso/kaniko-demo-image:1.0"
     volumeMounts:
-      - name: jenkins-docker-cfg
-        mountPath: /kaniko/.docker
+    - name: kaniko-secret
+      mountPath: /kaniko/.docker
+  restartPolicy: Never
   volumes:
-  - name: jenkins-docker-cfg
-    projected:
-      sources:
-      - secret:
-          name: docker-credentials 
-          items:
-            - key: .dockerconfigjson
-              path: config.json
+  - name: kaniko-secret
+    secret:
+      secretName: dockercred
+      items:
+        - key: .dockerconfigjson
+          path: config.json
 """
     }
   }
