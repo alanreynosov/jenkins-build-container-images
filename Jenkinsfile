@@ -3,10 +3,10 @@ pipeline {
 
     stages {
         stage{
-            steps{
+            steps('test'){
              sh 'kubectl get all --all-namespaces -o wide'   
             }
         }
     }
 
-}
+}        
