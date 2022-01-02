@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     stages {
-        stage{
-            steps('test'){
+        stage('test'){
+            steps{
              sh 'kubectl get all --all-namespaces -o wide'   
             }
         }
