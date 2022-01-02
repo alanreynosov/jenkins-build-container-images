@@ -13,11 +13,10 @@ spec:
     args:
     - 9999999
     volumeMounts:
-      - name: kaniko-secret
+      - name: jenkins-docker-cfg
         mountPath: /kaniko/.docker
-    restartPolicy: Never
   volumes:
-  - name: kaniko-secret
+  - name: jenkins-docker-cfg
     projected:
       sources:
       - secret:
