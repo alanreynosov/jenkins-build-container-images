@@ -33,7 +33,7 @@ spec:
         container(name: 'kaniko', shell: '/busybox/sh') {
           sh '''#!/busybox/sh
             echo "FROM jenkins/inbound-agent:latest" > Dockerfile
-            /kaniko/executor --context `pwd` --destination <docker-username>/hello-kaniko:latest 
+            /kaniko/executor --context `pwd` --destination alanreynoso/kaniko-demo-image:latest 
           '''
         }
       }
