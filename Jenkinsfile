@@ -17,11 +17,7 @@ metadata:
 spec:
   containers:
   - name: kaniko
-    image: gcr.io/kaniko-project/executor:v1.5.1-debug
-    imagePullPolicy: IfNotPresent
-    command:
-    - /busybox/cat
-    tty: true
+    image: gcr.io/kaniko-project/executor:latest
     volumeMounts:
       - name: kaniko-secret
         mountPath: /kaniko/.docker
@@ -44,13 +40,10 @@ spec:
               withEnv(['PATH+EXTRA=/busybox']) {
                 sh '''#!/busybox/sh -xe
                   /kaniko/executor \
-                    --dockerfile Dockerfile \
-                    --context `pwd`/ \
+                    --context=git://github.com/scriptcamp/kubernetes-kaniko \
                     --verbosity debug \
-                    --insecure \
-                    --skip-tls-verify \
-                    --destination alanreynoso/myapp:v0.1.0 \
-                    --destination alanreynoso/myapp:latest
+                    --destination=alanreynoso/kaniko-demo-image:1.0.${env.BUILD_NUMBER} \
+                    --destination=alanreynoso/kaniko-demo-image:latest
                 '''
               }
             }
