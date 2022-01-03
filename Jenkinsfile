@@ -28,7 +28,7 @@ spec:
   volumes:
   - name: jenkins-docker-cfg
     secret:
-        secretName: dockercreds
+        name: dockercreds
         items:
         - key: .dockerconfigjson
           path: config.json
