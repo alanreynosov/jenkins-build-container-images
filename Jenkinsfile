@@ -17,7 +17,7 @@ metadata:
 spec:
   containers:
   - name: kaniko
-    image: gcr.io/kaniko-project/executor:latest
+    image: gcr.io/kaniko-project/executor:v1.5.1-debug
     imagePullPolicy: IfNotPresent
     command:
     - /busybox/cat
@@ -45,8 +45,11 @@ spec:
                 sh '''#!/busybox/sh -xe
                   /kaniko/executor \
                     --context=git://github.com/scriptcamp/kubernetes-kaniko \
+                    --context `pwd`/ \
                     --verbosity debug \
-                    --destination=alanreynoso/kaniko-demo-image:1.0.${env.BUILD_NUMBER} \
+                    --insecure \
+                    --skip-tls-verify \
+                    --destination=alanreynoso/kaniko-demo-image:1.0 \
                     --destination=alanreynoso/kaniko-demo-image:latest
                 '''
               }
