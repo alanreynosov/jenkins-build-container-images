@@ -31,7 +31,7 @@ spec:
         name: dockercreds
         items:
         - key: .dockerconfigjson
-            path: config.json
+          path: config.json
 """
         }
     }
