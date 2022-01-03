@@ -27,13 +27,11 @@ spec:
         mountPath: /kaniko/.docker
   volumes:
   - name: jenkins-docker-cfg
-    projected:
-      sources:
-      - secret:
-          name: dockercreds
-          items:
-            - key: .dockerconfigjson
-              path: config.json
+    secret:
+        secretName: dockercreds
+        items:
+        - key: .dockerconfigjson
+          path: config.json
 """
         }
     }
