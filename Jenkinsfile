@@ -28,8 +28,8 @@ spec:
   volumes:
   - name: kaniko-secret
     secret:
-        name: dockercreds
-        items:
+      secretName: dockercred
+      items:
         - key: .dockerconfigjson
           path: config.json
 """
