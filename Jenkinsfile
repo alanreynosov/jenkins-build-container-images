@@ -1,71 +1,41 @@
-#!groovy
-
-def podLabel = "kaniko-${UUID.randomUUID().toString()}"
-
 pipeline {
-    agent {
-        kubernetes {
-            //inheritFrom 'kubepods'
-            defaultContainer 'jnlp'
-            yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    jenkins-build: app-build
-    some-label: "build-app-${BUILD_NUMBER}"
-spec:
-  containers:
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:v1.5.1-debug
-    imagePullPolicy: IfNotPresent
-    command:
-    - /busybox/cat
-    tty: true
-    volumeMounts:
-      - name: kaniko-secret
-        mountPath: /kaniko/.docker
-  volumes:
-  - name: kaniko-secret
-    secret:
-        secretName: dockercreds
-        items:
-        - key: .dockerconfigjson
-          path: config.json
-"""
-        }
+
+  options {
+    ansiColor('xterm')
+  }
+
+  agent {
+    kubernetes {
+      yamlFile 'builder.yaml'
     }
+  }
 
-    environment {
-        GITHUB_ACCESS_TOKEN  = credentials('github-token')
-    }
+  stages {
 
-    stages {
-
-        stage('Checkout Code') {
-            steps {
-              checkout scm
-            }
-        }
-
-        stage('Build with Kaniko') {
-          steps {
-            container(name: 'kaniko', shell: '/busybox/sh') {
-              withEnv(['PATH+EXTRA=/busybox']) {
-                sh '''#!/busybox/sh -xe
-                  /kaniko/executor \
-                    --dockerfile Dockerfile \
-                    --context `pwd`/ \
-                    --verbosity debug \
-                    --insecure \
-                    --skip-tls-verify \
-                    --destination dockername/myapp:v0.1.0 \
-                    --destination dockername/myapp:latest
-                '''
-              }
-            }
+    stage('Kaniko Build & Push Image') {
+      steps {
+        container('kaniko') {
+          script {
+            sh '''
+            /kaniko/executor --dockerfile `pwd`/Dockerfile \
+                             --context `pwd` \
+                             --destination=alanreynoso/kaniko-demo-image:${BUILD_NUMBER}
+            '''
           }
         }
-
+      }
     }
+
+    stage('Deploy App to Kubernetes') {     
+      steps {
+        container('kubectl') {
+          withCredentials([file(credentialsId: 'config', variable: 'KUBECONFIG')]) {
+            sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" myweb.yaml'
+            sh 'kubectl apply -f myweb.yaml'
+          }
+        }
+      }
+    }
+  
+  }
 }
