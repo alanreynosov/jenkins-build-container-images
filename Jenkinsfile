@@ -6,7 +6,7 @@ pipeline {
     agent {
         kubernetes {
             inheritFrom "kubepods"
-            //defaultContainer 'jnlp'
+            defaultContainer 'jnlp'
             yaml """
 apiVersion: v1
 kind: Pod
@@ -17,7 +17,7 @@ metadata:
 spec:
   containers:
   - name: kaniko
-    image: gcr.io/kaniko-project/executor:latest
+    image: gcr.io/kaniko-project/executor:v1.5.1-debug
     imagePullPolicy: IfNotPresent
     command:
     - /busybox/cat
@@ -41,7 +41,7 @@ spec:
         stage('Build with Kaniko') {
           steps {
             container(name: 'kaniko', shell: '/busybox/sh') {
-              withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
+              withEnv(['PATH+EXTRA=/busybox']) {
                 sh '''#!/busybox/sh -xe
                   /kaniko/executor \
                     --context=git://github.com/scriptcamp/kubernetes-kaniko \
