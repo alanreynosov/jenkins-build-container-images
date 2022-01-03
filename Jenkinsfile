@@ -5,8 +5,8 @@ def podLabel = "kaniko-${UUID.randomUUID().toString()}"
 pipeline {
     agent {
         kubernetes {
-            inheritFrom "kubepods"
-            defaultContainer 'jnlp'
+            //inheritFrom "kubepods"
+            //defaultContainer 'jnlp'
             yaml """
 apiVersion: v1
 kind: Pod
