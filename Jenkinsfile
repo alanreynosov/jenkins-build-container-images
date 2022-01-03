@@ -38,9 +38,19 @@ spec:
     stages {
 
         stage('Build with Kaniko') {
-          steps {
-            sh 'echo no args'
-          }
+          container(name: 'kaniko', shell: '/busybox/sh') {
+              withEnv(['PATH+EXTRA=/busybox']) {
+                sh '''#!/busybox/sh -xe
+                  /kaniko/executor \
+                    --dockerfile Dockerfile \
+                    --context `pwd`/ \
+                    --verbosity debug \
+                    --insecure \
+                    --skip-tls-verify \
+                    --destination dockername/myapp:v0.1.0 \
+                    --destination dockername/myapp:latest
+                '''
+              }
         }
 
     }
