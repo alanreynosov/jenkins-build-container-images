@@ -19,6 +19,7 @@ spec:
     args:
     - "--context=git://github.com/scriptcamp/kubernetes-kaniko"
     - "--destination=alanreynoso/kaniko-demo-image:1.0"
+    tty: true
     volumeMounts:
     - name: kaniko-secret
       mountPath: /kaniko/.docker
