@@ -11,19 +11,20 @@ pipeline {
 apiVersion: v1
 kind: Pod
 metadata:
-  name: kaniko
+  labels:
+    jenkins-build: app-build
+    some-label: "build-app-${BUILD_NUMBER}"
 spec:
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
-    args:
-    - "--context=git://github.com/scriptcamp/kubernetes-kaniko"
-    - "--destination=alanreynoso/kaniko-demo-image:1.0"
+    imagePullPolicy: IfNotPresent
+    command:
+    - /busybox/cat
     tty: true
     volumeMounts:
-    - name: kaniko-secret
-      mountPath: /kaniko/.docker
-  restartPolicy: Never
+      - name: kaniko-secret
+        mountPath: /kaniko/.docker
   volumes:
   - name: kaniko-secret
     secret:
@@ -38,19 +39,22 @@ spec:
     stages {
 
         stage('Build with Kaniko') {
-          container(name: 'kaniko', shell: '/busybox/sh') {
-              withEnv(['PATH+EXTRA=/busybox']) {
+          steps {
+            container(name: 'kaniko', shell: '/busybox/sh') {
+              withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
                 sh '''#!/busybox/sh -xe
                   /kaniko/executor \
-                    --dockerfile Dockerfile \
+                    --context=git://github.com/scriptcamp/kubernetes-kaniko \
                     --context `pwd`/ \
                     --verbosity debug \
                     --insecure \
                     --skip-tls-verify \
-                    --destination dockername/myapp:v0.1.0 \
-                    --destination dockername/myapp:latest
+                    --destination=alanreynoso/kaniko-demo-image:1.0 \
+                    --destination=alanreynoso/kaniko-demo-image:latest
                 '''
               }
+            }
+          }
         }
 
     }
