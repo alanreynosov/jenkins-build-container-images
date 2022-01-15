@@ -6,6 +6,7 @@ pipeline {
 
   agent {
     kubernetes {
+      label 'default'
       yamlFile 'builder.yaml'
     }
   }
@@ -29,7 +30,7 @@ pipeline {
     stage('Deploy App to Kubernetes') {     
       steps {
         container('kubectl') {
-          withCredentials([file(credentialsId: 'config', variable: 'KUBECONFIG')]) {
+          withCredentials([file(credentialsId: 'k3-config', variable: 'KUBECONFIG')]) {
             sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" myweb.yaml'
             sh 'kubectl apply -f myweb.yaml'
           }
