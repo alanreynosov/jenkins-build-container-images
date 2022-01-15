@@ -6,7 +6,7 @@ pipeline {
 
   agent {
     kubernetes {
-      label 'default'
+      label 'defaultt'
       yamlFile 'builder.yaml'
     }
   }
