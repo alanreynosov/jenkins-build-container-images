@@ -31,8 +31,9 @@ pipeline {
       steps {
         container('kubectl') {
           withCredentials([file(credentialsId: 'k3-config', variable: 'KUBECONFIG')]) {
+            sh 'uname -a'
             sh 'sed -i "s/<TAG>/${BUILD_NUMBER}/" myweb.yaml'
-            sh 'kubectl apply -f myweb.yaml'
+            sh '#kubectl apply -f myweb.yaml'
           }
         }
       }
