@@ -18,9 +18,9 @@ pipeline {
         container('kaniko') {
           script {
             sh '''
-            /kaniko/executor --dockerfile `pwd`/Dockerfile \
+            /kaniko/executor --dockerfile `pwd`/Dockerfile_${registr_repository_name} \
                              --context `pwd` \
-                             --destination=alanreynoso/kaniko-demo-image:${BUILD_NUMBER}
+                             --destination=alanreynoso/${registr_repository_name}:${BUILD_NUMBER}
             '''
           }
         }
