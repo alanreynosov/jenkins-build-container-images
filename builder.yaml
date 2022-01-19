@@ -6,6 +6,7 @@ spec:
   containers:
   - name: kubectl
     image: alpine:latest
+    imagePullPolicy: IfNotPresent
     command:
     - /bin/cat
     tty: true    
